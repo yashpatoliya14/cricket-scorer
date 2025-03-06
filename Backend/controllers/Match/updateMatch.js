@@ -93,6 +93,7 @@ const handleBowlerUpdate = async (bowlingTeam, newBowler) => {
         if (newBowler) {
             const newBowlerObject = await Player.create({ playerName: newBowler });
             bowlingTeam.currentBowler = new mongoose.Types.ObjectId(newBowlerObject._id);
+            bowlingTeam.playerList.push(new mongoose.Types.ObjectId(newBowlerObject._id));
         }
     }
 
@@ -108,6 +109,7 @@ const handleWicketUpdate = async (batsman, bowler, bowlingTeam, newBatsman, batt
 
     const newBatsmanObj = await Player.create({ playerName: newBatsman });
     battingTeam.currentStrickerBatsman = newBatsmanObj._id;
+    battingTeam.playerList.push(new mongoose.Types.ObjectId(newBatsmanObj._id));
 };
 
 //match overs completed 

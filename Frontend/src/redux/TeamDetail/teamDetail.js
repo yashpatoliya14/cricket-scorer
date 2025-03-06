@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 
 export const teamDetail = createSlice({
@@ -6,12 +6,16 @@ export const teamDetail = createSlice({
         hostTeam:"",
         visitorTeam:"",
         tossWon:"",
-        overs:0,
+        overs:0 ,
+        choice:"",
         noOfPlayerInTeam:11,
         isNoBall:true,
         noBallRun:1,
         isWideRun:true,
         wideRun:1,
+        currentStrickerBatsman:"",
+        currentNonStrickerBatsman:"",
+        currentBowler:""
     },
     name:"teamDetail",
     reducers:{
@@ -23,12 +27,25 @@ export const teamDetail = createSlice({
             state.tossWon = action.payload.tossWon
         },
         addOvers(state,action){
+            
             state.overs = action.payload.overs
+
+        },
+        addChoice(state,action){
+            
+            state.choice = action.payload.choice
+            console.log(state.choice);
+            
+        },
+        addPlayers(state,action){
+            state.currentStrickerBatsman = action.payload.strickerBatsman
+            state.currentNonStrickerBatsman = action.payload.nonStrickerBatsman
+            state.currentBowler = action.payload.bowler
         }
     }
 
 })
 
-export const {addTeams,addTossWinnerTeam,addOvers} = teamDetail.actions
+export const {addTeams,addTossWinnerTeam,addOvers,addChoice,addPlayers} = teamDetail.actions
 
 export default teamDetail.reducer;

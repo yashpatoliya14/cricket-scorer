@@ -9,6 +9,7 @@ const createMatch = async (req, res) => {
         visitorTeam,
         tossWon,
         overs,
+        choice,
         isNoBall,
         noBallRun,
         isWideRun,
@@ -28,24 +29,41 @@ const createMatch = async (req, res) => {
             Player.create({ playerName: currentBowler })
         ]);
 
-        console.log(strickerBatsman, nonStrickerBatsman, bowler);
-
         // Determine batting & bowling teams based on toss
-        const isHostBatting = tossWon.toString() === hostTeam.toString() && isBatFirst; 
- 
+        let batFirstTeam, bowlFirstTeam;  
+        
+        if(tossWon.toString() === hostTeam.toString()){
+            if(choice==='bat'){
+                batFirstTeam=hostTeam;
+                bowlFirstTeam=visitorTeam;
+            }else{
+                batFirstTeam=visitorTeam;
+                bowlFirstTeam=hostTeam;
+            }
+        }else{
+            if(choice==='bat'){
+                batFirstTeam=visitorTeam;
+                bowlFirstTeam=hostTeam;
+            }else{
+                batFirstTeam=hostTeam;
+                bowlFirstTeam=visitorTeam;
+            }
+        }
+
+
         const teams = await Promise.all([
             Team.create({ 
-                teamName: isHostBatting ? hostTeam : visitorTeam,
+                teamName: batFirstTeam,
                 noPlayers: noOfPlayerInTeam,
                 currentStrickerBatsman:strickerBatsman._id,
                 currentNonStrickerBatsman:nonStrickerBatsman._id,
-                // playerList: [strickerBatsman._id, nonStrickerBatsman._id]
+                playerList: [new mongoose.Types.ObjectId(strickerBatsman._id), new mongoose.Types.ObjectId(nonStrickerBatsman._id)]
             }),
             Team.create({ 
-                teamName: isHostBatting ? visitorTeam : hostTeam,
+                teamName: bowlFirstTeam,
                 noPlayers: noOfPlayerInTeam,
                 currentBowler:bowler._id,
-                // playerList: [bowler._id]
+                playerList: [new mongoose.Types.ObjectId(bowler._id)]
             })
         ])  
             
@@ -53,13 +71,14 @@ const createMatch = async (req, res) => {
         const match = await Match.create({
             hostTeam:new mongoose.Types.ObjectId(teams[0]._id),
             visitorTeam:new mongoose.Types.ObjectId(teams[1]._id), 
-            tossWon:new mongoose.Types.ObjectId(teams[isHostBatting ? 0 : 1]._id),
-            battingTeam:new mongoose.Types.ObjectId(teams[isHostBatting ? 0 : 1]._id),
-            bowlingTeam:new mongoose.Types.ObjectId(teams[isHostBatting ? 1 : 0]._id),
+            tossWon:new mongoose.Types.ObjectId(teams[tossWon.toString() === teams[0].teamName.toString() ? 0 : 1]._id),
+            battingTeam:new mongoose.Types.ObjectId(teams[0]._id),
+            bowlingTeam:new mongoose.Types.ObjectId(teams[1]._id),
             totalOvers: overs,
             isNoBall,
             noBallRun,
             isWideRun, 
+            choice,
             wideRun
         });
         

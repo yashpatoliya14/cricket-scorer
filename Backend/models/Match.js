@@ -22,6 +22,11 @@ const matchSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "Team",
     },
+    
+    choice:{
+        type: String,
+        default: ""
+    },
     isCompleted: {
         type: Boolean,
         default: false
